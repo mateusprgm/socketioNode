@@ -18,15 +18,17 @@ const getOnlineUsers = () => {
 
  const getOnlineUsersRoom = room => {
  	let numClients
- 	
+ 	try{
  		let clients = io.sockets.clients().connected;
 		let client = io.sockets.adapter.rooms[room].sockets;
 		numClients = (typeof client !== 'undefined') ? Object.keys(client).length : 0;
 		console.log(numClients);
 		
- 	
+ 	}catch(e){
+		numClients = "";
+ 	}finally{
  		return numClients;
- 	
+ 	}
 
  	
   
@@ -57,10 +59,11 @@ io.on("connection", function(socket) {
 
    socket.on("leave-room", function(room){
     console.log('[socket]','leave room :', room);
-    io.emit('users-changed', {event: 'left', onUsersRoom: getOnlineUsersRoom(room), exited:false}); 
-    console.log('aqui doido');
+    io.emit('users-changed', {us: socket.username, event: 'left', onUsersRoom: getOnlineUsersRoom(room), exited:false}); 
     socket.leave(room);
   })
+
+
 
     
   socket.on("join-room", function(room){
